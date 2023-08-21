@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!--necessary to set utf-8 for Hebrew-->
+    <meta charset="UTF-8">
+    <!-- Google Font for Hebrew -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Hebrew:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for the play icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+
+    <title>קריאה יומית</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Noto Sans Hebrew', Arial, sans-serif; /* Apply the Hebrew font */
+            background-color: darkseagreen;
+        }
+
+        #word-container {
+            text-align: center;
+        }
+
+        #play-button {
+            margin-top: 10px;
+            font-size: 3em;
+        }
+
+        #word-of-the-day {
+            font-size: 7em;
+        }
+
+        .play-icon {
+            background: none; /* Remove background color */
+            border: none; /* Remove border */
+            padding: 0; /* Remove padding */
+            font-size: 48px; /* Adjust the icon size as needed */
+            color: #000000; /* Set the icon color */
+            cursor: pointer; /* Add cursor pointer for interaction */
+        }
+
+        #audio-player {
+            display: none; /* hide the HTML 5 audio player */
+        }
+
+        .playing {
+            color: white; /* change color of play button while playing */
+        }
+
+        /* Style for the menu button container */
+        .menu-icon {
+            position: absolute;
+            top: 10px; /* Adjust the top position as needed */
+            right: 10px; /* Adjust the right position as needed */
+            cursor: pointer;
+            font-size: 36px; /* Adjust the icon size as needed */
+            color: white;
+        }
+
+        /* Adjust the size for smaller screens, like iPhones in portrait mode */
+        @media (max-width: 768px) {
+        .menu-icon {
+            font-size: 64x; /* Increase the size for smaller screens */
+        }
+}
+
+    </style>
+</head>
+<body>
+    <a href="your-other-page.html" id="menu-button" class="menu-icon">
+        <!-- Replace "fa-icon-name" with the Font Awesome icon you want -->
+        <i class="fa solid fa-bars"></i>
+    </a>
+    
+
+    <div id="word-container">
+        <h1 id="word-of-the-day">Word of the Day</h1>
+        <button id="play-button" class="play-icon">
+            <i class="fas fa-play-circle"></i> <!-- Font Awesome play icon -->
+        </button>
+    </div>
+    <!-- Audio Player -->
+    <audio id="audio-player" controls>
+        <!-- Add your audio source(s) here -->
+        <source src="" type="audio/mp3">
+    </audio>
+    <script>
+        const wordDict = {
+  1: { "word": "השמש זורחת", "audioPath": "audio/1.mp3" },
+  2: { "word": "אני אוהב כדורגל", "audioPath": "audio/2.mp3" },
+  3: { "word": "התפוח טעים", "audioPath": "audio/3.mp3" },
+  4: { "word": "הכלב אוהב לשחק", "audioPath": "audio/4.mp3" },
+  5: { "word": "החתול רך ונמרץ", "audioPath": "audio/5.mp3" },
+  6: { "word": "אני אוהב לקרוא ספרים", "audioPath": "audio/6.mp3" },
+  7: { "word": "הסוס רואה גם בלילה", "audioPath": "audio/7.mp3" },
+  8: { "word": "אני אוהב את אמא ואבא", "audioPath": "audio/8.mp3" },
+  9: { "word": "השוקולד טעים מאוד", "audioPath": "audio/9.mp3" },
+  10: { "word": "העץ גדל ביער", "audioPath": "audio/10.mp3" },
+  11: { "word": "הירח מאיר בלילה", "audioPath": "audio/11.mp3" },
+  12: { "word": "הכדור נפל לאדמה", "audioPath": "audio/12.mp3" },
+  13: { "word": "הטווים ארוכים ודקים", "audioPath": "audio/13.mp3" },
+  14: { "word": "הפרחים פורחים באביב", "audioPath": "audio/14.mp3" },
+  15: { "word": "אני רואה כוכבים בשמיים", "audioPath": "audio/15.mp3" },
+  16: { "word": "אני אוכל פירות", "audioPath": "audio/16.mp3" },
+  17: { "word": "האור גם ביום", "audioPath": "audio/17.mp3" },
+  18: { "word": "החוף ים יפה", "audioPath": "audio/18.mp3" },
+  19: { "word": "המים צוננים", "audioPath": "audio/19.mp3" },
+  20: { "word": "אני אוהב לצייר", "audioPath": "audio/20.mp3" },
+  21: { "word": "הפעלים חשובים", "audioPath": "audio/21.mp3" },
+  22: { "word": "הילדים משחקים בגן", "audioPath": "audio/22.mp3" },
+  23: { "word": "אני רוצה גלידה", "audioPath": "audio/23.mp3" },
+  24: { "word": "הדג בוחר במים", "audioPath": "audio/24.mp3" },
+  25: { "word": "אני אוהב לקפוץ", "audioPath": "audio/25.mp3" },
+  26: { "word": "העוף טס בשמיים", "audioPath": "audio/26.mp3" },
+  27: { "word": "המלך יושב על הכסא", "audioPath": "audio/27.mp3" },
+  28: { "word": "הגביע מלא במים", "audioPath": "audio/28.mp3" },
+  29: { "word": "הדינוזואר הוא דינוזואר", "audioPath": "audio/29.mp3" },
+  30: { "word": "החורף קר", "audioPath": "audio/30.mp3" },
+  31: { "word": "האביב מאיר וחם", "audioPath": "audio/31.mp3" },
+  32: { "word": "הקיץ חם ושמשי", "audioPath": "audio/32.mp3" },
+  33: { "word": "החוף ים של חול", "audioPath": "audio/33.mp3" },
+  34: { "word": "אני אוהב לצאת לטבע", "audioPath": "audio/34.mp3" },
+  35: { "word": "הקיץ זמן לבריזה", "audioPath": "audio/35.mp3" },
+  36: { "word": "הפירות מתים בטמפרטורה גבוהה", "audioPath": "audio/36.mp3" },
+  37: { "word": "הפרפר דואג לצופה", "audioPath": "audio/37.mp3" },
+  38: { "word": "הספר מרתק ומפתיע", "audioPath": "audio/38.mp3" },
+  39: { "word": "הגרסה החדשה טובה יותר", "audioPath": "audio/39.mp3" },
+  40: { "word": "הילדים משחקים בחוץ", "audioPath": "audio/40.mp3" },
+  41: { "word": "אני אוהב לשוטט ביער", "audioPath": "audio/41.mp3" },
+  42: { "word": "השמש מזריחה חום", "audioPath": "audio/42.mp3" },
+  43: { "word": "החמימות נעימה", "audioPath": "audio/43.mp3" },
+  44: { "word": "המחצבה עמוקה", "audioPath": "audio/44.mp3" },
+  45: { "word": "העובדים נחמדים", "audioPath": "audio/45.mp3" },
+  46: { "word": "הדייגים תופסים דגים", "audioPath": "audio/46.mp3" },
+  47: { "word": "השוק רועש", "audioPath": "audio/47.mp3" },
+  48: { "word": "המלחמה מסוכנת", "audioPath": "audio/48.mp3" },
+  49: { "word": "אני רוצה פיצה", "audioPath": "audio/49.mp3" },
+  50: { "word": "הילדים אוהבים סוסים", "audioPath": "audio/50.mp3" }
+};
+
+        const initialDate = new Date('2023-08-20'); // Set initialDate to today
+
+        const timeDifference = new Date() - initialDate;
+        const daysSinceInitialDate = Math.floor(timeDifference / (24 * 60 * 60 * 1000));
+
+        let currentDay = daysSinceInitialDate % Object.keys(wordDict).length;
+
+        const wordOfTheDayElement = document.getElementById('word-of-the-day');
+        const playButton = document.getElementById('play-button');
+        const audioPlayer = document.getElementById('audio-player');
+
+        function updateWordOfTheDay() {
+            const offset = currentDay % Object.keys(wordDict).length;
+            const currentItem = wordDict[offset]; // Offset is 0-based, so add 1
+            if (currentItem) {
+                wordOfTheDayElement.innerText = currentItem.word;
+                playButton.setAttribute('data-audio-path', currentItem.audioPath);
+            }
+        }
+
+        playButton.addEventListener('click', () => {
+            const audioPath = playButton.getAttribute('data-audio-path');
+            console.log(`Playing audio: ${audioPath}`);
+
+            // Set the audio source to the selected path
+            audioPlayer.src = audioPath;
+
+            // Play the audio
+            audioPlayer.play();
+        });
+
+        // change color when button is playing
+        audioPlayer.addEventListener('play', ()=> {
+            playButton.classList.add('playing')
+        })
+
+        audioPlayer.addEventListener('pause', () => {
+            playButton.classList.remove('playing');
+        });
+
+
+        updateWordOfTheDay();
+
+        setInterval(() => {
+            currentDay = (currentDay % Object.keys(wordDict).length) + 1;
+            updateWordOfTheDay();
+        }, 24 * 60 * 60 * 1000); // Change word every 24 hours
+    </script>
+</body>
+</html>
