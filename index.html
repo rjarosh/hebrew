@@ -20,6 +20,10 @@
             background-color: darkseagreen;
         }
 
+        button {
+            margin: 15px;
+        }
+
         #word-container {
             text-align: center;
         }
@@ -65,7 +69,8 @@
         .menu-icon {
             font-size: 64x; /* Increase the size for smaller screens */
         }
-}
+    }
+
 
     </style>
 </head>
@@ -81,13 +86,90 @@
         <button id="play-button" class="play-icon">
             <i class="fas fa-play-circle"></i> <!-- Font Awesome play icon -->
         </button>
+        <button id="record-button" class="play-icon">
+            <i class="fas fa-record-vinyl"></i> <!-- Record icon -->
+        </button>
+        <button id="play-recorded-button" class="play-icon">
+            <i class="fas fa-play"></i> <!-- Second playback icon -->
+        </button>
     </div>
-    <!-- Audio Player -->
+    
+    <!-- Audio Player 1 -->
     <audio id="audio-player" controls>
         <!-- Add your audio source(s) here -->
         <source src="" type="audio/mp3">
     </audio>
+    
+    
+    <!--Second audio player-->
+
+    <audio id="recorded-audio-player" controls style="display: none;"></audio>
+
     <script>
+
+// Add these variables at the top of your JavaScript
+const recordButton = document.getElementById('record-button');
+const playRecordedButton = document.getElementById('play-recorded-button');
+const recordedAudioPlayer = document.getElementById('recorded-audio-player');
+
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+let recordedAudioBlob;
+
+// Add event listeners for the record and play buttons
+recordButton.addEventListener('click', () => {
+    if (!mediaRecorder) {
+        // Start recording
+        navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+                mediaRecorder = new MediaRecorder(stream);
+
+                //clear previous
+                audioChunks =[]
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    recordedAudioBlob = audioBlob;
+                    recordedAudioPlayer.src = URL.createObjectURL(audioBlob);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordButton.innerHTML = '<i class="fas fa-stop-circle"></i>';
+            })
+            .catch((error) => {
+                console.error('Error accessing microphone:', error);
+            });
+    } else {
+        if (isRecording) {
+            // Stop recording
+            mediaRecorder.stop();
+            mediaRecorder = null;
+            isRecording = false;
+            recordButton.innerHTML = '<i class="fas fa-record-vinyl"></i>';
+        } else {
+            // Playback recorded audio
+            recordedAudioPlayer.play();
+        }
+    }
+});
+
+// Add event listener for the second playback button
+playRecordedButton.addEventListener('click', () => {
+    // Playback recorded audio
+    recordedAudioPlayer.play();
+});
+
+
+
         const wordDict = {
   1: { "word": "השמש זורחת", "audioPath": "audio/1.mp3" },
   2: { "word": "אני אוהב כדורגל", "audioPath": "audio/2.mp3" },
