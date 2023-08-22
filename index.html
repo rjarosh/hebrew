@@ -263,6 +263,16 @@ playRecordedButton.addEventListener('click', () => {
             playButton.classList.remove('playing');
         });
 
+        recordedAudioPlayer.addEventListener('play', ()=> {
+            playRecordedButton.classList.add('playing')
+        })
+
+        recordedAudioPlayer.addEventListener('pause', ()=> {
+            playRecordedButton.classList.remove('playing')
+        })
+
+        
+
 
         updateWordOfTheDay();
 
@@ -270,6 +280,58 @@ playRecordedButton.addEventListener('click', () => {
             currentDay = (currentDay % Object.keys(wordDict).length) + 1;
             updateWordOfTheDay();
         }, 24 * 60 * 60 * 1000); // Change word every 24 hours
+
+
+        // Function to update the current day
+        function updateCurrentDay(offset) {
+            currentDay = (currentDay + offset) % Object.keys(wordDict).length;
+            if (currentDay < 0) {
+                currentDay += Object.keys(wordDict).length;
+            }
+            updateWordOfTheDay();
+        }
+
+        // Event listener for left arrow key (previous day)
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowLeft') {
+                updateCurrentDay(-1);
+            }
+        });
+
+        // Event listener for right arrow key (next day)
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'ArrowRight') {
+                updateCurrentDay(1);
+            }
+        });
+
+        // Variables for swipe detection on touch devices
+        let touchStartX = null;
+        let touchEndX = null;
+
+        // Event listener for touchstart (touch begin)
+        document.addEventListener('touchstart', (event) => {
+            touchStartX = event.touches[0].clientX;
+        });
+
+        // Event listener for touchmove (swipe)
+        document.addEventListener('touchmove', (event) => {
+            touchEndX = event.touches[0].clientX;
+        });
+
+        // Event listener for touchend (touch end)
+        document.addEventListener('touchend', () => {
+            if (touchStartX !== null && touchEndX !== null) {
+                const swipeDistance = touchEndX - touchStartX;
+                if (swipeDistance > 50) {
+                    updateCurrentDay(-1); // Swipe right (previous day)
+                } else if (swipeDistance < -50) {
+                    updateCurrentDay(1); // Swipe left (next day)
+                }
+            }
+            touchStartX = null;
+            touchEndX = null;
+        });
     </script>
 </body>
 </html>

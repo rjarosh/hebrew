@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HTML5 Audio Recorder and Player</title>
+</head>
+<body>
+    <div>
+        <button id="startRecord">Start Recording</button>
+        <button id="stopRecord" disabled>Stop Recording</button>
+    </div>
+    <div>
+        <audio id="audioPlayer" controls></audio>
+    </div>
+</body>
+</html>
+
+<script>
+    // Get DOM elements
+const startRecordButton = document.getElementById('startRecord');
+const stopRecordButton = document.getElementById('stopRecord');
+const audioPlayer = document.getElementById('audioPlayer');
+
+let mediaRecorder;
+let audioChunks = [];
+
+// Check for browser support
+if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    // Access the user's microphone
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(function (stream) {
+            // Create a MediaRecorder instance
+            mediaRecorder = new MediaRecorder(stream);
+
+            // Event handler for when data is available
+            mediaRecorder.ondataavailable = function (event) {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+
+            // Event handler for when recording stops
+            mediaRecorder.onstop = function () {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                audioPlayer.src = URL.createObjectURL(audioBlob);
+            };
+
+            // Start recording
+            startRecordButton.addEventListener('click', function () {
+                mediaRecorder.start();
+                startRecordButton.disabled = true;
+                stopRecordButton.disabled = false;
+            });
+
+            // Stop recording
+            stopRecordButton.addEventListener('click', function () {
+                mediaRecorder.stop();
+                startRecordButton.disabled = false;
+                stopRecordButton.disabled = true;
+            });
+        })
+        .catch(function (error) {
+            console.error('Error accessing microphone:', error);
+        });
+} else {
+    console.error('getUserMedia not supported in this browser');
+}
+
+</script>
